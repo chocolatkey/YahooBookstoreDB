@@ -18,6 +18,11 @@ function escapec($string) {
     return preg_replace($pattern, $replacement, $string);
 }
 
+function getImageUrl($url) {
+  return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url='.$url;
+  //'&resize_w=' + width
+}
+
 function sort_by_id($a, $b) {
     if((int)$a->id == (int)$b->id){ return 0 ; }
     return ($a->id > $b->id) ? -1 : 1;
@@ -55,11 +60,13 @@ if(!isset($_GET['rss'])) {
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="referrer" content="no-referrer" />
         <title>Yahoo Bookstore DB Browser</title>
         <link rel="stylesheet" href="static/bulma.min.css" type="text/css">
         <link rel="stylesheet" href="static/easy-autocomplete.min.css"> 
         <script src="static/jquery.min.js"></script> 
         <script src="static/jquery.easy-autocomplete.min.js"></script>
+        <script src="static/lazysizes.min.js" async></script>
         <style>.select:after { z-index:1; }</style>
     </head>
     <body>
@@ -137,7 +144,7 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
                     "<div class='columns'>
                       <div class='column is-one-quarter'>
                         <p class='image'>
-                          <img src='".$item->thumb."/thumb_m.png'>
+                          <img class='lazyload' data-src='".getImageUrl($item->thumb)."/thumb_m.png'>
                         </p>
                       </div>
                       <div class='column is-three-quarters'>
@@ -267,6 +274,9 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
             </div>
         </section>
         <script>
+        function getImageUrl(url) {
+          return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url=' + url;
+        }
         var pattern = /([\!\*\+\-\=\<\>\&\|\(\)\[\]\{\}\^\~\?\:\\/"])/g;
         var options = {
             url: function(phrase) {
@@ -279,7 +289,7 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
             template: {
                 type: "custom",
                 method: function(value, item) {
-                    return "<a href='?search=1&id=" + item["id"] + "'><img style='width: 50px; height: auto;' src='" + item["thumb"] + "/thumb_s.png' /> " + value + " (" + item["titlekana"] + ")</a>";
+                    return "<a href='?search=1&id=" + item["id"] + "'><img style='width: 50px; height: auto;' src='" + getImageUrl(item["thumb"]) + "/thumb_s.png' /> " + value + " (" + item["titlekana"] + ")</a>";
                 }
             },
             getValue: "title"
@@ -311,7 +321,7 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
                 type: "custom",
                 method: function(value, item) {
                     if(item["thumb"])
-                        return "<a href='?search=1&id=" + item["id"] + "'><img style='width: 50px; height: auto;' src='" + item["thumb"] + "/thumb_s.png' /> " + value + " (" + item["title"] + ")</a>";
+                        return "<a href='?search=1&id=" + item["id"] + "'><img style='width: 50px; height: auto;' src='" + getImageUrl(item["thumb"]) + "/thumb_s.png' /> " + value + " (" + item["title"] + ")</a>";
                     else
                         return value + " (Error: " + item["result"] + ")"
                 }
