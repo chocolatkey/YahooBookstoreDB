@@ -42,7 +42,7 @@ function getdata($search) {
 }
 
 function getresults($search, $unsafe = false) {
-    $result = json_decode(getdata('select?wt=json&fq=result:1'.($unsafe ? $search : '&rows=50&q='.urlencode($search))));
+    $result = json_decode(getdata('select?wt=json&fq=result:1'.($unsafe ? $search : '&q='.urlencode($search)).'&rows=50'));
     return $result->responseHeader->status === 0 ? $result->response->docs : [];
 }
 
@@ -99,9 +99,8 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
                 array_push($params, "(authors.Name:".$_GET['author']." OR authors.Ruby:".$_GET['author'].")");
 
         if(isset($_GET['rss'])) {
-            $results = getresults('&fl=id,title,description&rows=1000000&q='.urlencode(implode(" AND ", $params)), true); // Warning: gets all rows!
+            $results = getresults('&fl=id,title,description&q='.urlencode(implode(" AND ", $params)), true);
             usort($results, "sort_by_id"); // sort for largest id first
-            $results = array_slice($results, 0, 50);
             
             $selfurl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
             $UFeed = new RSS2();
@@ -115,7 +114,7 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
             $UFeed->addGenerator(); // Hell why not!
             foreach($results as $item) {
                 $newItem = $UFeed->createNewItem();
-                $newItem->setTitle($item->title[0].' (#'.$item->id.')');
+                $newItem->setTitle($item->title.' (#'.$item->id.')');
                 $newItem->setLink('https://viewer-bookstore.yahoo.co.jp/?cid='.$item->id.'&u0=1&u2=3&u1=3');
                 $newItem->setDescription($item->description);
                 //$newItem->setDate($item->_version_); lol epic fail
