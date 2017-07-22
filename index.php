@@ -1,16 +1,23 @@
 <?php
 /**
  * YDB search page
- * Henry (chocolatkey) 2017-01-10
+ * Henry (chocolatkey) 2017-07-22
  */
 
-// For RSS (yeah sorry for not composing blabla)
-include 'lib/Item.php';
-include 'lib/Feed.php';
-include 'lib/RSS2.php';
-include 'lib/InvalidOperationException.php';
 date_default_timezone_set('UTC');
+// For RSS (yeah sorry for not composing blabla)
+require 'lib/FeedWriter/Item.php';
+require 'lib/FeedWriter/Feed.php';
+require 'lib/FeedWriter/RSS2.php';
+require 'lib/FeedWriter/InvalidOperationException.php';
 use \FeedWriter\RSS2;
+// For Memecaching
+require 'lib/Clickalicious/Memcached/Bootstrap.php';
+use Clickalicious\Memcached\Client;
+define('MCP', 'ydb_'); // memcache key prefix
+$cache = new Client(
+    '127.0.0.1'
+);
 
 function escapec($string) {
     $pattern = '/([\!\*\+\-\=\<\>\&\|\(\)\[\]\{\}\^\~\?\:\\/"])/g';
@@ -42,8 +49,15 @@ function getdata($search) {
 }
 
 function getresults($search, $unsafe = false) {
-    $result = json_decode(getdata('select?wt=json&fq=result:1'.($unsafe ? $search : '&q='.urlencode($search)).'&rows=50'));
-    return $result->responseHeader->status === 0 ? $result->response->docs : [];
+    global $cache;
+    $shash = md5($search);
+    $results = $cache->get(MCP.$shash);
+    if(!$results) {
+        $results = getdata('select?wt=json&fq=result:1'.($unsafe ? $search : '&q='.urlencode($search)).'&rows=50');
+        $cache->set(MCP.$shash, $results, 60);
+    }
+    $results = json_decode($results);
+    return $results->responseHeader->status === 0 ? $results->response->docs : [];
 }
 
 if(isset($_GET['ajax']) && isset($_GET['query'])) {
@@ -172,7 +186,11 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
             </div>
         </section>
 <?php } else {
-    $results = json_decode(getdata('select?wt=json&fq=result:1&q=*&rows=0&facet=true&facet.field=categories&facet.field=publisher&stats=true&stats.field=id')); 
+    $results = $cache->get(MCP.'stats');
+    if(!$results) {
+        $results = json_decode(getdata('select?wt=json&fq=result:1&q=*&rows=0&facet=true&facet.field=categories&facet.field=publisher&stats=true&stats.field=id'));
+        $cache->set(MCP.'stats', $results, 300);
+    }
     $actual = [];
     if($results->responseHeader->status === 0) {
         $list = $results->facet_counts->facet_fields->categories;
