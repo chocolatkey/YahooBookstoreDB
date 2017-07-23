@@ -12,7 +12,6 @@ No, crawler will not be released. Example cron:
 - Apache Solr
 - Linux w/ webserver, PHP and memcached
 - Python 3.x
-=======
 - Linux w/ webserver & PHP
 - Python
 
