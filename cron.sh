@@ -5,7 +5,7 @@ if [ $# -eq 0 ]
     echo "YDB updater"
     echo "Please provide ARGUMENT for additional DB file name"
 else
-    python3.6 /home/media/manga/yrip.py -c true -f true -d true -a "$@"-cron.json -r 796000-800000
+    python3.6 /home/media/manga/yrip.py -c true -f true -d true -a "$@"-cron.json -r 798000-810000
     sudo cp -R /home/media/manga/"$@"-cron.json /var/solr
     sudo su - solr -c "/opt/solr/bin/post -c ydb *-cron.json"
     sleep 1

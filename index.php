@@ -76,6 +76,7 @@ if(!isset($_GET['rss'])) {
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta name="referrer" content="no-referrer" />
         <title>Yahoo Bookstore DB Browser</title>
+        <meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
         <link rel="stylesheet" href="static/bulma.min.css" type="text/css">
         <link rel="stylesheet" href="static/easy-autocomplete.min.css"> 
         <script src="static/jquery.min.js"></script> 

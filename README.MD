@@ -1,5 +1,4 @@
 # Yahoo Bookstore Database
-[Available live here](https://ivy.chocolatkey.com/manga/)
 
 No, crawler will not be released. Example cron:
 
