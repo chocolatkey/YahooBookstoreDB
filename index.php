@@ -26,7 +26,7 @@ function escapec($string) {
 }
 
 function getImageUrl($url) {
-  return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url='.$url;
+  return 'https://images'.rand(1,4).'-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url='.$url;
   //'&resize_w=' + width
 }
 
@@ -293,7 +293,7 @@ if(isset($_GET['search']) || isset($_GET['rss'])) {
         </section>
         <script>
         function getImageUrl(url) {
-          return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url=' + url;
+          return 'https://images' + (Math.floor(Math.random() * 4) + 1) + '-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url=' + url;
         }
         var pattern = /([\!\*\+\-\=\<\>\&\|\(\)\[\]\{\}\^\~\?\:\\/"])/g;
         var options = {
